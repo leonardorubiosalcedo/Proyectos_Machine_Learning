@@ -172,7 +172,7 @@ mc <- table(test$retiro_max, test$yhat)
 
 A continuaci?n, podemos observar el accuracy del modelo
 ```{r chung18, include=TRUE}
-sum(diag(mc)) / sum(mc) # Accuracy
+sum(diag(mc)) / sum(mc) # 
 ```
 En este paso generamos los datos del pron?stico. 
 ```{r chung19, include=TRUE}
