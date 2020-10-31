@@ -181,7 +181,7 @@ pronosticos <- test %>% select(Cedula_anonimizada,retiro_max,probs,yhat)
 head(pronosticos)
 ```
 
-Mistramos los atributos de salida
+Mostramos los atributos de salida
 ```{r chung21, include=TRUE}
 summary(datos_join1)
 ```
