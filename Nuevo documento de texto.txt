@@ -1,6 +1,10 @@
 Prueba i rama principal genial
 
+<<<<<<< HEAD
 
 
 
 Esta es la prueba de la rama final que todavia no lo tengo 
+=======
+generamos la caabecera como prueba de los datos para la siguietente ruta 
+>>>>>>> cabecera
