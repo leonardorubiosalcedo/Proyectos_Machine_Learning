@@ -1,0 +1,175 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(forecast)
+library(readxl)
+Ejercicio <- read_excel("C:/Users/ASUS/Downloads/Ejercicio.xlsx")
+head(Ejercicio)
+```
+
+```{r}
+str(Ejercicio)
+```
+
+#PI
+
+Generamos la serie para el indicador PI
+```{r}
+set.seed(148)
+serie_PI<-ts(Ejercicio[,2])
+```
+
+Analizamos la autocorrelacion y autocorrelacion parcial 
+```{r}
+acf(serie_PI)
+pacf(serie_PI)
+```
+
+Devido a que no presenta estacionalidad se define P=0
+El modelo de autocorrelacion parcial define un orden autoregresivo de 2
+```{r}
+ajuste_PI<-nnetar(serie_PI,p=2,P=0, lambda = NULL)
+(f<-forecast(ajuste_PI,h=5))
+autoplot(f)
+```
+
+Verificamos el modelo creado con los datos historicos
+```{r}
+autoplot(serie_PI) + autolayer(fitted(ajuste_PI))
+```
+
+Generamos 9 series de tiempo para ver el comportamiento de los pronosticos 
+```{r}
+sim <- ts(matrix(0,nrow = 5L, ncol=9L),start = end(serie_PI)[1L]+1L)
+for (i in seq(9)) {
+  sim[,i]<- simulate(ajuste_PI,nsim = 5L)
+}
+ autoplot(serie_PI)+autolayer(sim)
+```
+
+Establecemos la prediccion y su intervalo de confianza 
+```{r}
+f1<-forecast(ajuste_PI,PI=TRUE,h=5)
+autoplot(f1)
+```
+Generamos las metricas del modelo 
+```{r}
+accuracy(ajuste_PI)
+```
+
+
+## PN
+
+Generamos la serie para el indicador PI
+```{r}
+serie_PN<-ts(Ejercicio[,3])
+```
+
+Analizamos la autocorrelacion y autocorrelacion parcial 
+```{r}
+acf(serie_PN)
+pacf(serie_PN)
+```
+
+Devido a que no presenta estacionalidad se define P=0
+El modelo de autocorrelacion parcial define un orden autoregresivo de 3
+```{r}
+set.seed(3456)
+ajuste_PN<-nnetar(serie_PN,p=3,P=0, lambda = 0, size = 30)
+(f<-forecast(ajuste_PN,h=5))
+autoplot(f)
+```
+
+Verificamos el modelo creado con los datos historicos
+```{r}
+autoplot(serie_PN) + autolayer(fitted(ajuste_PN))
+```
+
+Generamos 9 series de tiempo para ver el comportamiento de los pronosticos 
+```{r}
+sim <- ts(matrix(0,nrow = 5L, ncol=9L),start = end(serie_PN)[1L]+1L)
+for (i in seq(9)) {
+  sim[,i]<- simulate(ajuste_PN,nsim = 5L)
+}
+ autoplot(serie_PN)+autolayer(sim)
+```
+
+Establecemos la prediccion y su intervalo de confianza 
+```{r}
+f1<-forecast(ajuste_PN,PI=TRUE,h=5)
+autoplot(f1)
+```
+Generamos las metricas del modelo 
+```{r}
+accuracy(ajuste_PN)
+```
+
+#PIB
+
+```{r}
+set.seed(148)
+serie_PIB<-ts(Ejercicio[,4])
+```
+
+Analizamos la autocorrelacion y autocorrelacion parcial 
+```{r}
+acf(serie_PIB)
+pacf(serie_PIB)
+```
+
+
+```{r}
+set.seed(23034)
+ajuste_PIB<-nnetar(serie_PIB,p=1,P=0,lambda = 0)#ajuste_PIB<-nnetar(serie_PIB,p=2,P=0)
+(f<-forecast(ajuste_PIB,h=5))
+autoplot(f)
+```
+
+```{r}
+autoplot(serie_PIB) + autolayer(fitted(ajuste_PIB))
+```
+
+```{r}
+sim <- ts(matrix(0,nrow = 5L, ncol=9L),start = end(serie_PIB)[1L]+1L)
+for (i in seq(9)) {
+  sim[,i]<- simulate(ajuste_PIB,nsim = 5L)
+}
+ autoplot(serie_PIB)+autolayer(sim)
+```
+
+```{r}
+f1<-forecast(ajuste_PIB,PI=TRUE,h=5)
+autoplot(f1)
+```
+
+```{r}
+accuracy(ajuste_PIB)
+```
+
+
+
+
+
+```{r}
+set.seed(148)
+serie_TRM<-ts(Ejercicio[,7])
+#acf(serie_TRM)
+#pacf(serie_TRM)
+set.seed(23034)
+ajuste_TRM<-nnetar(serie_TRM,p=1,P=0,lambda = 0)#ajuste_PIB<-nnetar(serie_PIB,p=2,P=0)
+(f<-forecast(ajuste_TRM,h=5))
+autoplot(f)
+autoplot(serie_TRM) + autolayer(fitted(ajuste_TRM))
+sim <- ts(matrix(0,nrow = 5L, ncol=9L),start = end(serie_TRM)[1L]+1L)
+for (i in seq(9)) {
+  sim[,i]<- simulate(ajuste_TRM,nsim = 5L)
+}
+ autoplot(serie_TRM)+autolayer(sim)
+f1<-forecast(ajuste_TRM,PI=TRUE,h=5)
+autoplot(f1)
+accuracy(ajuste_TRM)
+```
+

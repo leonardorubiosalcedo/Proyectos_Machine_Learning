@@ -1,0 +1,152 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(forecast)
+library(readxl)
+ejemplo <- read_excel("DEMANDA BOGMIA.xlsx",sheet = "Hoja2")
+```
+
+Box-cox es una funcion de suvisamiento 
+```{r}
+ejemplo<-ts(ejemplo)
+ajuste<-nnetar(ejemplo,lambda = 0)
+accuracy(ajuste)
+(f<-forecast(ajuste,h=10))
+autoplot(f)
+```
+Cantidad de pronosticos tienden a infinito 
+```{r}
+(f<-forecast(ajuste,h=100))
+autoplot(f)
+```
+
+
+
+Residuales media constante..
+varianza tiene que ser constante 
+Simulacion para los intervalos de confianza 
+nrow : Indica la cantidad de pronosticos hacia adelante, debe de coincidir con el de arriba,
+ncol : Indica la cantidad de series que se utilizan para los intervalos, se recomienda que ncol sea grande 
+```{r}
+sim<-ts(matrix(0,nrow=10L,ncol=9L),
+        start=end(ejemplo)[1L]+1L)
+for(i in seq(9))
+  sim[,i]<-simulate(ajuste,nsim=10L)
+#grafica de los pronosticos con su IC
+autoplot(ejemplo)+autolayer(sim)
+```
+
+
+```{r}
+sim<-ts(matrix(0,nrow=10L,ncol=50L),
+        start=end(ejemplo)[1L]+1L)
+for(i in seq(9))
+  sim[,i]<-simulate(ajuste,nsim=10L)
+#grafica de los pronosticos con su IC
+autoplot(ejemplo)+autolayer(sim)
+```
+
+
+npaths para controlar el numero de simulaciones , por defecto el utiliza 1000
+que pasa si el valor esta por debajo de 1000 ?
+que pasa si el valor esta por ensima de 1000 ?
+```{r}
+f1<-forecast(ajuste,PI=TRUE,h=10)
+autoplot(f1)
+```
+
+```{r}
+f2<-forecast(ajuste, npaths = 500,PI=TRUE,h=10)
+autoplot(f2)
+```
+
+```{r}
+f3<-forecast(ajuste,npaths = 5000 ,PI=TRUE,h=10)
+autoplot(f3)
+```
+
+
+Definir p: es el orden autoregresivo, por defecto es 1
+Definir P: es el orden estacional, por defecto es 1
+Deinir Lambda: Es la transformacion de BOX-COX
+              si lambda = 0 entonces ln(x)
+              si lambda = -1 entonces 1/xi
+              si lambda = -0.5 entonces 1/ raiz(xi)
+              si lambda = 0.5 entonces raiz(xi)
+              si lambda = -2 entonces xi^2
+Se recomienda usar la transformacion cuando se tienen valores positivos y diferentes de 0 
+size = el numero de nodos, por defecto es 1 , que pasa si aumento el numero de nodos ? 
+```{r}
+accuracy(ajuste)
+```
+
+```{r}
+ajuste2<-nnetar(ejemplo,lambda = 0, size = 50)
+accuracy(ajuste2)
+```
+
+
+
+h es el numero de pasos adelante que se decea pronosticar
+que pasa si h tiende a infinito 
+```{r}
+ejemplo<-ts(ejemplo)
+ajuste<-nnetar(ejemplo,lambda = 0, size=10)
+accuracy(ajuste)
+(f<-forecast(ajuste,h=10))
+autoplot(f)
+```
+
+
+```{r}
+ejemplo<-ts(ejemplo)
+ajuste<-nnetar(ejemplo,lambda = 0, size=100)
+accuracy(ajuste)
+(f<-forecast(ajuste,h=100))
+autoplot(f)
+```
+No funciona para modelos a largo plazo por que cuando se estiman muchos pronosticos converge a un valor que es la media como una serie clasica 
+
+Pruebas del ajuste 
+```{r}
+ajuste<-nnetar(ejemplo, p=1, lambda = 0)
+```
+
+
+```{r}
+ejemplo<-ts(ejemplo)
+ajuste<-nnetar(ejemplo,p=3,lambda = 0, size=10)
+accuracy(ajuste)
+(f<-forecast(ajuste,h=10))
+autoplot(f)
+f1<-forecast(ajuste,PI=TRUE,h=10)
+autoplot(f1)
+```
+
+
+```{r}
+ajuste<- nnetar(ejemplo, )
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+

@@ -1,0 +1,165 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Lineas series de tiempo 
+
+```{r}
+library(readxl)
+library(FinTS)
+library(tseries)
+library(lmtest)
+library(forecast)
+library(aTSA)
+library(nortest)
+```
+
+Generamos la serie de tiempo 
+```{r}
+kg <- read_excel("D:/Universidad/Maestria/Machine Learning Supervisado y no supervisado/DEMANDA BOGMIA.xlsx", 
+    sheet = "Hoja2")
+kg <- ts(kg, frequency = 12, start = c(2017,1))
+```
+
+Grafico de linea 
+grafico de estacionalidad
+algo de volatilidad 
+
+
+visualmente comportamiento creciente leve 
+visualmente parece tener media constante (Estacionaria)
+No hay evidencia de estacionalidad 
+```{r}
+plot(kg)
+```
+Descomposicion de la serie 
+```{r}
+plot(decompose(kg))
+```
+Se evidencia tendencia en el segundo grafico
+Existe un componente de estacionalidad que se debe probar sin embargo se debe contar con mas informacion (usar ACF con una diferencia)
+Existe un comportamiento aleatorio a lo largo del tiempo 
+
+3 modelo arima 
+pruebas raiz unitaria (Philiz - perron y Dickey Fuller)
+```{r}
+pp.test(kg)
+```
+hipotesis H0 la serie no es estacionaria indica el rechazo de la hipotesis nula en otras palabras la serie es estacionaria en Nivel por el valor alpha > 0.05
+
+```{r}
+adf.test(kg)
+```
+La prueba de D-f A indica el rechazo de la nula, en otras palabras es estacionaria en nivel (d=0)
+graficos de autocorrelacion y auto correlacion parcial.
+
+En el grafico de Autocorrelacion  se pueden observar varias cosas 
+a. si tiene caida rapida la serie es estacionaria en nivel 
+b. si tiene comportamientos repetitivos indica la existencia de una raiz estacional (D= ?)
+```{r}
+acf(kg, lag.max=48)
+```
+- No existe un comportamiento estacional por que las barritas no se salen al mismo tiempo y 
+- tiene caida rapida por lo tanto es estacionaria como lo decian las pruebas 
+en esta grafica se pueden ver los ordenes de q={1,3}
+q es cuantos promedios atras necesito en mi promedio movil que orden del modelo prodria ser, siempre se incluye el 1, el 3 se toma por que se sale el siguiente no se toma por que son muy poquitos valores 
+
+el grafico de autocorrelacion parcial 
+```{r}
+pacf(kg, lag.max=48)
+```
+Ordenes de p={1,3} el resto estan dentro de las bandas o ya son muy viejos 
+
+Modelo Arima 
+```{r}
+auto.arima(kg)
+```
+Diferencia de orden 12 pero no le queda ningun parametro T y Q 
+```{r}
+coeftest(auto.arima(kg))
+```
+si es significativo pero no es bueno 
+
+para ordenes p 
+ARIMA (1,0,0) p=1
+ARIMA (3,0,0) p=3
+ARIMA (0,0,1) q=1
+ARIMA (0,0,3) q=3
+
+ARIMA (1,0,1) p=1,q=1
+ARIMA (1,0,3) q=1,q=3
+ARIMA (3,0,1) q=3,q=1
+ARIMA (3,0,3) q=3,q=3
+
+```{r}
+arima1<-arima(kg, order= c(1,0,0))
+summary(arima1)
+coeftest(arima1)
+```
+EL modelo arima no sirve al 5% de significancia por lo cual se cabia de modelo 
+```{r}
+plot(kg)
+lines(kg-arima1$residuals, col= "green")
+```
+
+el fixed elimina parametros mas significantes este ya funciona 
+```{r}
+arima2<-arima(kg, order= c(3,0,0), fixed = c(NA, 0, NA, NA ))
+summary(arima2)
+coeftest(arima2)
+plot(kg)
+lines(kg-arima2$residuals, col= "green")
+```
+se comporta bien y tiene buena significancia 0,0,1
+```{r}
+arima3<-arima(kg, order= c(0,0,1))
+summary(arima3)
+coeftest(arima3)
+plot(kg)
+lines(kg-arima2$residuals, col= "green")
+```
+
+```{r}
+arima4<-arima(kg, order= c(0,0,3) , fixed = c(NA,0,NA,NA))
+summary(arima4)
+coeftest(arima4)
+plot(kg)
+lines(kg-arima4$residuals, col= "green")
+```
+
+```{r}
+arima5<-arima(kg, order= c(1,0,1))
+summary(arima5)
+coeftest(arima5)
+plot(kg)
+lines(kg-arima5$residuals, col= "green")
+```
+fixed quita los valores no representativos dentro del summary 
+```{r}
+arima6<-arima(kg, order= c(1,0,3), fixed=)
+summary(arima6)
+coeftest(arima6)
+plot(kg)
+lines(kg-arima6$residuals, col= "green")
+```
+calculo taza de crecimiento discreta
+```{r}
+taza_crecimiento <- diff(kg, lag= 1)/lag(kg,-1)
+```
+
+```{r}
+arima6<-arima(taza_crecimiento, order= c(2,0,3))
+summary(arima6)
+coeftest(arima6)
+plot(taza_crecimiento)
+lines(taza_crecimiento-arima6$residuals, col= "green")
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
